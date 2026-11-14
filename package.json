@@ -1,0 +1,60 @@
+{
+  "name": "notice-me",
+  "author": "leyla",
+  "version": "0.1.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {},
+  "scripts": {
+    "test": "node tools/run-tests.js",
+    "test:unit": "node tools/build-config.js && node --test test/",
+    "build:config": "node tools/build-config.js"
+  },
+  "pebble": {
+    "displayName": "Notice Me",
+    "uuid": "159c972b-3cbd-4d46-b842-3b50e53d743e",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "messageKeys": [
+      "SETTINGS",
+      "STATUS",
+      "TASK_COUNT",
+      "TASK_INDEX",
+      "TASK_ID",
+      "TASK_TITLE",
+      "TASK_FLAGS",
+      "TASK_PRIORITY",
+      "QUIET",
+      "REFRESH",
+      "EVENT_ID",
+      "EVENT_KIND",
+      "TEST_NOW",
+      "TEST_NUDGE"
+    ],
+    "capabilities": [
+      "configurable"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_MENU_ICON",
+          "file": "icon.png",
+          "menuIcon": true
+        }
+      ]
+    }
+  }
+}

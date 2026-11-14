@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--PARAMS-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Notice Me settings</title>
+<style>
+:root {
+  --bg: #f2f3f5; --card: #ffffff; --text: #1b1d21; --muted: #646a73; --line: #dde0e5;
+  --input: #ffffff; --accent: #0a6cf0; --accent-text: #ffffff; --danger: #c62828; --soft: #eef3fd;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111317; --card: #1c1f25; --text: #e9ebef; --muted: #9aa1ab; --line: #30343c;
+    --input: #14161a; --accent: #4c94ff; --accent-text: #0b1220; --danger: #ff6b6b; --soft: #1d2633;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  padding-bottom: 84px;
+}
+header { padding: 20px 16px 4px; max-width: 640px; margin: 0 auto; }
+header h1 { margin: 0; font-size: 24px; }
+header p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+main { max-width: 640px; margin: 0 auto; padding: 8px 12px; }
+section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 14px 10px; margin: 12px 0; }
+section h2 { margin: 0 0 4px; font-size: 17px; }
+.help { color: var(--muted); font-size: 13.5px; margin: 0 0 10px; }
+.field { display: grid; grid-template-columns: 1fr minmax(6.5em, 42%); gap: 2px 12px; align-items: center;
+  padding: 9px 0; border-top: 1px solid var(--line); }
+.field:first-of-type { border-top: 0; }
+.field > .name { font-weight: 500; }
+.field > .hint { grid-column: 1; color: var(--muted); font-size: 12.5px; }
+.field > input, .field > select { grid-column: 2; grid-row: 1 / span 2; }
+input, select, button { font: inherit; color: inherit; }
+input[type=text], input[type=number], input[type=time], input[type=datetime-local], select {
+  width: 100%; min-width: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--input); font-size: 16px;
+}
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+input[type=checkbox] { width: 22px; height: 22px; margin: 0; accent-color: var(--accent); }
+button { border: 1px solid var(--line); background: var(--input); border-radius: 9px; padding: 8px 12px; cursor: pointer; }
+button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 600; }
+button.danger { color: var(--danger); }
+input[type=password], input[type=url] {
+  width: 100%; min-width: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--input); font-size: 16px;
+}
+.field.wide { grid-template-columns: 1fr; }
+.field.wide > input { grid-column: 1; grid-row: auto; margin-top: 4px; }
+.note { border: 1px solid var(--line); border-radius: 11px; background: var(--soft); padding: 9px 11px; margin: 10px 0 4px;
+  font-size: 13.5px; }
+.note b { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.note.bad { border-color: var(--danger); }
+#savebar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line);
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
+#savebar button { display: block; width: 100%; max-width: 616px; margin: 0 auto; padding: 12px; font-size: 17px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Notice Me</h1>
+  <p>Your watch shows the few tasks at the top of your list, times your focus on the one you start, and nudges you when an active task turns into sitting.</p>
+</header>
+<main>
+  <section>
+    <h2>Task list</h2>
+    <p class="help">Tasks come from a project on your Vikunja server, highest priority first, then oldest first. Starting one on the watch moves it to the “in progress” column of the project's kanban board; finishing it marks it done.</p>
+    <label class="field wide"><span class="name">Server address</span>
+      <input type="url" inputmode="url" placeholder="https://tasks.example.org" autocomplete="off" autocapitalize="off" spellcheck="false" data-field="server.url"></label>
+    <label class="field wide"><span class="name">API token</span><span class="hint">Vikunja: Settings → API Tokens. It needs to read projects, views and tasks, update tasks, move tasks between buckets, and manage the project's webhooks.</span>
+      <input type="password" placeholder="tk_…" autocomplete="off" autocapitalize="off" spellcheck="false" data-field="server.token"></label>
+    <label class="field wide"><span class="name">Project</span><span class="hint">its title or number</span>
+      <input type="text" list="projects" autocomplete="off" data-field="server.project"></label>
+    <datalist id="projects"></datalist>
+    <label class="field wide"><span class="name">“In progress” column</span><span class="hint">the kanban bucket a started task moves to</span>
+      <input type="text" list="buckets" autocomplete="off" data-field="server.inProgress"></label>
+    <datalist id="buckets"></datalist>
+    <label class="field wide"><span class="name">Active label</span><span class="hint">tasks with this label are not sedentary: sit still while focusing on one and the watch buzzes</span>
+      <input type="text" autocomplete="off" autocapitalize="off" data-field="server.activeLabel"></label>
+    <div class="note" id="sync-note" hidden><b>Last sync</b><span id="sync-status"></span></div>
+    <div class="note" id="push-note" hidden><b>Live updates</b><span id="push-status"></span></div>
+  </section>
+
+  <section>
+    <h2>Focus timer</h2>
+    <p class="help">A started task runs rounds of focus and breaks. The watch buzzes at every change, also when the app is closed.</p>
+    <label class="field"><span class="name">Focus</span><span class="hint">minutes</span>
+      <input type="number" inputmode="numeric" min="1" max="120" data-field="timer.focus"></label>
+    <label class="field"><span class="name">Short break</span><span class="hint">minutes</span>
+      <input type="number" inputmode="numeric" min="1" max="60" data-field="timer.shortBreak"></label>
+    <label class="field"><span class="name">Long break</span><span class="hint">minutes, after the last focus</span>
+      <input type="number" inputmode="numeric" min="1" max="60" data-field="timer.longBreak"></label>
+    <label class="field"><span class="name">Rounds</span><span class="hint">focus blocks before the long break</span>
+      <input type="number" inputmode="numeric" min="1" max="8" data-field="timer.rounds"></label>
+  </section>
+
+  <section>
+    <h2>Movement</h2>
+    <p class="help">While you focus on a task with the active label, the watch notices sitting still and buzzes you back to the task.</p>
+    <label class="field"><span class="name">Nudge after</span><span class="hint">minutes of sitting still</span>
+      <input type="number" inputmode="numeric" min="1" max="60" data-field="movement.nudgeMinutes"></label>
+    <label class="field"><span class="name">Sensitivity</span><span class="hint">how little movement counts as moving</span>
+      <select data-field="movement.sensitivity">
+        <option value="0">Low: only big movements</option>
+        <option value="1">Normal</option>
+        <option value="2">High: small movements count</option>
+      </select></label>
+  </section>
+
+  <section>
+    <h2>On the watch</h2>
+    <label class="field"><span class="name">Tasks shown at once</span><span class="hint">the rest wait out of sight</span>
+      <input type="number" inputmode="numeric" min="1" max="5" data-field="showMax"></label>
+  </section>
+</main>
+<div id="savebar"><button class="primary" id="save" type="button">Save</button></div>
+
+<!--NOTICEME-MODULES-->
+<script>
+'use strict';
+var settings = window.NoticeMe.settings;
+var params = window.__params || {};
+var remote = params.remote || {};
+var state = settings.normalize(params.config);
+
+function $(id) { return document.getElementById(id); }
+
+function fillFields() {
+  document.querySelectorAll('[data-field]').forEach(function (input) {
+    var p = input.getAttribute('data-field').split('.');
+    input.value = p.length === 2 ? state[p[0]][p[1]] : state[p[0]];
+  });
+}
+function readFields() {
+  document.querySelectorAll('[data-field]').forEach(function (input) {
+    var p = input.getAttribute('data-field').split('.');
+    if (p.length === 2) state[p[0]][p[1]] = input.value;
+    else state[p[0]] = input.value;
+  });
+}
+
+function fillList(id, titles) {
+  var list = $(id);
+  list.textContent = '';
+  (titles || []).forEach(function (title) {
+    var option = document.createElement('option');
+    option.value = title;
+    list.appendChild(option);
+  });
+}
+
+// What the phone learned the last time it talked to the server.
+function showRemote() {
+  fillList('projects', remote.projects);
+  fillList('buckets', remote.buckets);
+  var configured = settings.configured(state);
+  var sync = remote.status || (remote.syncedAt ? 'Tasks fetched ' + new Date(remote.syncedAt * 1000).toLocaleString() : '');
+  $('sync-note').hidden = !configured || !sync;
+  $('sync-note').classList.toggle('bad', !!remote.status);
+  $('sync-status').textContent = sync;
+  var push = remote.push === 'on' ? 'On: the server tells your watch when a task changes.' : remote.push;
+  $('push-note').hidden = !configured || !push;
+  $('push-note').classList.toggle('bad', remote.push !== 'on');
+  $('push-status').textContent = push || '';
+}
+
+function fillForm(config) {
+  state = settings.normalize(config);
+  fillFields();
+  showRemote();
+}
+
+// The settings as they would be saved.
+function readForm() {
+  readFields();
+  return settings.normalize(state);
+}
+
+function save() {
+  var result = { config: readForm() };
+  var returnTo = params.return_to || 'pebblejs://close#';
+  document.location = returnTo + encodeURIComponent(JSON.stringify(result));
+}
+
+$('save').addEventListener('click', save);
+fillForm(state);
+</script>
+</body>
+</html>
